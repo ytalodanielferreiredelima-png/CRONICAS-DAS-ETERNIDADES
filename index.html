@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>O Crepúsculo das Sombras Eternas - Reader</title>
+    <style>
+        :root {
+            --bg-color: #0A0E14;
+            --surface-color: #161B22;
+            --primary-color: #B388FF; /* Roxo Nebula */
+            --text-color: #E5E5E7;
+            --secondary-text: #8E8E93;
+            --accent-gold: #D4AF37;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Georgia', serif; /* Fonte clássica para leitura */
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Cabeçalho */
+        header {
+            padding: 15px;
+            background-color: var(--surface-color);
+            border-bottom: 1px solid #2C2C2E;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            font-size: 0.9rem;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0;
+        }
+
+        /* Área de Leitura */
+        #reader-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px 20px;
+            line-height: 1.8;
+            text-align: justify;
+            transition: all 0.3s ease;
+        }
+
+        .chapter-meta {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .chapter-number {
+            color: var(--accent-gold);
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .mnemis-tag {
+            background: rgba(179, 136, 255, 0.1);
+            color: var(--primary-color);
+            padding: 2px 6px;
+            border-radius: 4px;
+            cursor: help;
+            border-bottom: 1px dotted var(--primary-color);
+        }
+
+        /* Rodapé de Controles */
+        footer {
+            background-color: var(--surface-color);
+            padding: 15px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid #2C2C2E;
+        }
+
+        .btn-control {
+            background: none;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-control:hover {
+            background-color: var(--primary-color);
+            color: var(--bg-color);
+        }
+
+        /* Scrollbar customizada */
+        #reader-container::-webkit-scrollbar {
+            width: 5px;
+        }
+        #reader-container::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <span style="color: var(--secondary-text);">☰</span>
+        <h1>O Crepúsculo das Sombras Eternas</h1>
+        <span style="color: var(--secondary-text);">⚙</span>
+    </header>
+
+    <main id="reader-container">
+        <div class="chapter-meta">
+            <span class="chapter-number">CAPÍTULO 38</span>
+            <h2 style="margin-top: 10px;">Sistemas de Propulsão</h2>
+        </div>
+
+        <article id="book-text" style="font-size: 18px;">
+            <p>Caelum ficou parada no corredor por mais algum tempo. Depois foi para os sistemas de propulsão e começou a verificação.</p>
+            
+            <p>Havia uma questão que havia estado evitando formular completamente porque formulá-la completamente exigiria respondê-la, e a resposta tinha implicações que não estava pronta para ter.</p>
+
+            <p>Se a <span class="mnemis-tag" onclick="alert('Arca-1: A última esperança da humanidade, projetada para abrigar 412.000 pessoas.')">Arca-1</span> partisse — se partisse cedo, sem autorização, com os oito por cento restantes dos sistemas de propulsão ainda incompletos — ela levaria quatrocentos e doze mil pessoas para longe da Terra, para longe da guerra, para longe do que estava chegando no espaço profundo.</p>
+
+            <p>Incluindo Lira. Que nunca havia sentido chuva. Que tinha um caderno cheio de descrições de coisas que nunca poderia experienciar.</p>
+            
+            <p>Caelum sabia o cheiro de oceano por texto e não por memória. Mas trabalho era, por enquanto, o lugar onde as perguntas sem resposta podiam ser colocadas.</p>
+        </article>
+
+        <hr style="border: 0; border-top: 1px solid #2C2C2E; margin: 40px 0;">
+        <p style="text-align: center; color: var(--secondary-text); font-style: italic;">[ Nota de arquivo — MNEMIS ]</p>
+    </main>
+
+    <footer>
+        <button class="btn-control" onclick="changeSize(-2)">A-</button>
+        <div id="progress" style="font-size: 0.8rem; color: var(--secondary-text);">Progresso: 85%</div>
+        <button class="btn-control" onclick="changeSize(2)">A+</button>
+    </footer>
+
+    <script>
+        function changeSize(delta) {
+            const textElement = document.getElementById('book-text');
+            const currentSize = parseInt(window.getComputedStyle(textElement).fontSize);
+            textElement.style.fontSize = (currentSize + delta) + 'px';
+        }
+    </script>
+
+</body>
+</html>
