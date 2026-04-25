@@ -8,9 +8,8 @@
 <style>
 :root{
  --bg:#050505;
- --panel:#111;
- --accent:#8b0000;
  --gold:#c9a44c;
+ --red:#8b0000;
  --text:#eaeaea;
 }
 
@@ -19,9 +18,8 @@ body{
  font-family:Georgia, serif;
  background:var(--bg);
  color:var(--text);
- display:flex;
- height:100vh;
  overflow:hidden;
+ transition:0.5s;
 }
 
 /* FUNDO VIVO */
@@ -30,323 +28,215 @@ body::before{
  position:fixed;
  width:200%;
  height:200%;
- background:radial-gradient(circle at center, #300000, #000);
- animation:moveBg 20s infinite linear;
- opacity:0.4;
+ background:radial-gradient(circle,#300000,#000);
+ animation:bg 25s linear infinite;
+ opacity:.3;
+}
+@keyframes bg{
+ to{transform:translate(-30%,-30%)}
 }
 
-@keyframes moveBg{
- from{transform:translate(0,0)}
- to{transform:translate(-25%,-25%)}
+/* TELAS */
+.screen{display:none;height:100vh;overflow:auto;padding:20px;}
+.active{display:block}
+
+/* OLHO */
+.eye{
+ width:200px;height:200px;border-radius:50%;
+ background:radial-gradient(circle,red,black 70%);
+ margin:auto;position:relative;
+}
+.pupil{
+ width:60px;height:60px;background:black;border-radius:50%;
+ position:absolute;top:70px;left:70px;
 }
 
-/* NAV */
-nav{
- width:90px;
- background:#000;
- border-right:1px solid #222;
- display:flex;
- flex-direction:column;
- align-items:center;
- padding:20px 0;
- z-index:2;
+/* BOTÕES */
+.btn{
+ padding:12px 20px;
+ background:linear-gradient(90deg,var(--red),var(--gold));
+ border:none;color:white;cursor:pointer;
+ margin:5px;
 }
 
-nav button{
- background:none;
- border:none;
- color:#666;
- cursor:pointer;
- margin:10px 0;
- transition:.3s;
-}
-
-nav button:hover{color:white}
-nav button.active{color:var(--gold)}
-
-/* MAIN */
-main{
- flex:1;
- overflow:auto;
- padding:30px;
- z-index:2;
-}
-
-.view{display:none}
-.view.active{display:block}
-
-/* CAPA */
-.cover{
- text-align:center;
- padding-top:100px;
-}
-
-.cover h1{
- font-size:60px;
- color:var(--gold);
- text-shadow:0 0 20px rgba(255,215,0,0.3);
- animation:pulse 3s infinite;
-}
-
-@keyframes pulse{
- 0%,100%{opacity:1}
- 50%{opacity:0.6}
-}
-
-/* GRID */
-.grid{
- display:grid;
- grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
- gap:15px;
-}
-
+/* CARD */
 .card{
- background:var(--panel);
- border:1px solid #222;
- padding:15px;
- border-radius:8px;
- cursor:pointer;
- transition:.3s;
+ background:#111;padding:15px;margin:10px 0;border-radius:10px;
+ cursor:pointer;border:1px solid #222;
 }
 
-.card:hover{
- transform:scale(1.05);
- border-color:var(--accent);
-}
+/* PROGRESSO */
+.progress{height:5px;background:#222;}
+.bar{height:100%;background:var(--gold);width:0%;}
 
 /* EDITOR */
-.block{
- background:#111;
- border:1px solid #222;
- padding:15px;
- border-radius:8px;
- margin-bottom:10px;
-}
-
+.block{background:#111;padding:10px;margin:10px 0;}
 [contenteditable]{outline:none}
 
-.title{font-size:28px;color:var(--gold)}
-.text{font-size:16px}
-
-.line{
- border-bottom:2px solid var(--accent);
- margin:10px 0;
-}
-
-/* TOOLBAR */
-.toolbar{
- display:flex;
- gap:5px;
- margin-bottom:5px;
-}
-
-.toolbar button,input{
- background:#222;
- border:1px solid #333;
- color:white;
- padding:5px;
-}
-
-/* BOTÃO */
-.fab{
- position:fixed;
- bottom:25px;
- right:25px;
- width:65px;
- height:65px;
- border-radius:50%;
- background:var(--accent);
- border:none;
- color:white;
- font-size:22px;
- cursor:pointer;
- box-shadow:0 0 20px rgba(139,0,0,0.5);
-}
-
 /* CODEX */
-#codexContent{
- background:#111;
- padding:15px;
- border-radius:10px;
-}
+#codexContent{background:#111;padding:10px;border-radius:10px;}
 </style>
 </head>
 
 <body>
 
-<nav>
-<button onclick="view('cover')" id="btn-cover">🜂</button>
-<button onclick="view('library')" id="btn-library">📚</button>
-<button onclick="view('editor')" id="btn-editor">✍️</button>
-<button onclick="view('codex')" id="btn-codex">📖</button>
-<button onclick="view('adm')" id="btn-adm">⚙️</button>
-</nav>
+<!-- AUDIO -->
+<audio id="wind" loop src="https://cdn.pixabay.com/audio/2022/03/15/audio_115b9b3a1d.mp3"></audio>
+<audio id="whisper" loop src="https://cdn.pixabay.com/audio/2021/09/06/audio_7c6e6cdb1b.mp3"></audio>
 
-<main>
+<div style="position:fixed;top:10px;right:10px;">
+<button onclick="toggleAudio()">🔊</button>
+<button onclick="toggleMode()">🌗</button>
+<button onclick="exportBook()">📕</button>
+</div>
 
 <!-- CAPA -->
-<div id="cover" class="view cover">
-<h1 id="titleDisplay">Crônicas do Abismo das Eternidades</h1>
-<p id="authorDisplay">Autor Desconhecido</p>
+<div id="cover" class="screen active">
+<div class="eye"><div class="pupil" id="pupil"></div></div>
+<h1>Crônicas do Abismo</h1>
+<button class="btn" onclick="start()">Despertar</button>
 </div>
 
 <!-- BIBLIOTECA -->
-<div id="library" class="view">
-<h1>Capítulos</h1>
-<div class="grid" id="chapters"></div>
-<button onclick="newChapter()">+ Criar Capítulo</button>
+<div id="library" class="screen">
+<h2>Continuar</h2>
+<div id="continue"></div>
+
+<h2>Episódios</h2>
+<div id="episodes"></div>
+
+<button class="btn" onclick="newChapter()">Novo</button>
+<button class="btn" onclick="generateAI()">IA</button>
+<button class="btn" onclick="openEditor()">Editor</button>
+<button class="btn" onclick="openCodex()">Codex</button>
+</div>
+
+<!-- LEITOR -->
+<div id="reader" class="screen">
+<button onclick="back()">←</button>
+<div class="progress"><div class="bar" id="bar"></div></div>
+<div id="content"></div>
 </div>
 
 <!-- EDITOR -->
-<div id="editor" class="view">
-<h1 contenteditable id="chapterTitle">Novo Capítulo</h1>
-
+<div id="editor" class="screen">
+<h2 contenteditable id="chapterTitle">Capítulo</h2>
 <div id="canvas"></div>
-
-<button onclick="addBlock('title')">Título</button>
-<button onclick="addBlock('text')">Texto</button>
-<button onclick="addBlock('line')">Linha</button>
-
-<button class="fab" onclick="saveChapter()">💾</button>
+<button onclick="addBlock()">+ Texto</button>
+<button onclick="saveChapter()">Salvar</button>
 </div>
 
 <!-- CODEX -->
-<div id="codex" class="view">
-<h1>Códice</h1>
+<div id="codex" class="screen">
+<button onclick="back()">←</button>
 <button onclick="addCodex()">+ Entrada</button>
 <ul id="codexList"></ul>
 <div id="codexContent"></div>
 </div>
 
-<!-- ADM -->
-<div id="adm" class="view">
-<h1>Configurações</h1>
-<input id="titleInput" oninput="updateMeta()" placeholder="Título"><br><br>
-<input id="authorInput" oninput="updateMeta()" placeholder="Autor"><br><br>
-<button onclick="clearAll()">Apagar Tudo</button>
-</div>
-
-</main>
-
 <script>
-let db={meta:{title:"Crônicas do Abismo das Eternidades",author:"Autor"},chapters:[],codex:[]}
+let db={chapters:[],progress:{},codex:[]}
 let current=-1
 
-function saveDB(){localStorage.setItem("abismo",JSON.stringify(db))}
-function loadDB(){let d=localStorage.getItem("abismo"); if(d) db=JSON.parse(d)}
+/* OLHO */
+document.addEventListener("mousemove",e=>{
+ pupil.style.transform=`translate(${e.clientX/50}px,${e.clientY/50}px)`
+})
 
-function view(v){
- document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"))
- document.getElementById(v).classList.add("active")
+/* AUDIO */
+function toggleAudio(){
+ wind.paused ? (wind.play(),whisper.play()) : (wind.pause(),whisper.pause())
 }
 
-function addBlock(type,html=""){
+/* MODO */
+function toggleMode(){document.body.classList.toggle("gold")}
+
+/* NAV */
+function show(id){
+ document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"))
+ document.getElementById(id).classList.add("active")
+}
+
+function start(){
+ toggleAudio()
+ renderEpisodes()
+ show("library")
+}
+
+/* EPISÓDIOS */
+function renderEpisodes(){
+ episodes.innerHTML=db.chapters.map((c,i)=>`
+  <div class="card" onclick="openEpisode(${i})">
+   <h3>${c.title}</h3>
+  </div>`).join("")
+}
+
+function openEpisode(i){
+ current=i
+ let c=db.chapters[i]
+ content.innerHTML=`<h1>${c.title}</h1><p>${c.content}</p>`
+ show("reader")
+}
+
+/* NOVO */
+function newChapter(){
+ let t=prompt("Título"),c=prompt("Texto")
+ if(t&&c){db.chapters.push({title:t,content:c});renderEpisodes()}
+}
+
+/* EDITOR */
+function openEditor(){show("editor")}
+function addBlock(){
  let div=document.createElement("div")
  div.className="block"
-
- if(type==="line"){
-  div.innerHTML=`<div class="line"></div>`
- }else{
-  div.innerHTML=`
-   <div class="toolbar">
-    <button onclick="document.execCommand('bold')">B</button>
-    <button onclick="document.execCommand('italic')">I</button>
-    <input type="color" onchange="document.execCommand('foreColor',false,this.value)">
-   </div>
-   <div contenteditable class="${type}">${html}</div>
-  `
- }
-
+ div.contentEditable=true
  canvas.appendChild(div)
 }
-
-/* CAPÍTULOS */
-function renderChapters(){
- chapters.innerHTML=db.chapters.map((c,i)=>`
-  <div class="card" onclick="loadChapter(${i})">
-   <h3>${c.title}</h3>
-  </div>
- `).join("")
-}
-
-function newChapter(){
- current=-1
- canvas.innerHTML=""
- chapterTitle.innerText="Novo Capítulo"
- view("editor")
-}
-
-function loadChapter(i){
- current=i
- let ch=db.chapters[i]
- chapterTitle.innerText=ch.title
- canvas.innerHTML=""
- ch.content.forEach(b=>addBlock(b.type,b.html))
- view("editor")
-}
-
 function saveChapter(){
- let blocks=[]
- document.querySelectorAll("#canvas div[contenteditable]").forEach(el=>{
-  blocks.push({type:el.className,html:el.innerHTML})
- })
-
- let data={title:chapterTitle.innerText,content:blocks}
-
- if(current==-1) db.chapters.push(data)
- else db.chapters[current]=data
-
- saveDB()
- alert("Salvo!")
- view("library")
- renderChapters()
+ let text=[...canvas.children].map(x=>x.innerHTML).join("<br>")
+ db.chapters.push({title:chapterTitle.innerText,content:text})
+ renderEpisodes()
 }
 
 /* CODEX */
+function openCodex(){show("codex");renderCodex()}
 function addCodex(){
- let name=prompt("Nome:")
- if(!name)return
- db.codex.push({name,text:""})
- saveDB()
+ let n=prompt("Nome"); if(!n)return
+ db.codex.push({name:n,text:""})
  renderCodex()
 }
-
 function renderCodex(){
  codexList.innerHTML=db.codex.map((c,i)=>`
-  <li onclick="openCodex(${i})">${c.name}</li>
- `).join("")
+  <li onclick="openEntry(${i})">${c.name}</li>`).join("")
 }
-
-function openCodex(i){
+function openEntry(i){
  let c=db.codex[i]
  codexContent.innerHTML=`
-  <h2 contenteditable oninput="db.codex[${i}].name=this.innerText;saveDB()">${c.name}</h2>
-  <div contenteditable oninput="db.codex[${i}].text=this.innerHTML;saveDB()">${c.text}</div>
- `
+  <h2 contenteditable oninput="db.codex[${i}].name=this.innerText">${c.name}</h2>
+  <div contenteditable oninput="db.codex[${i}].text=this.innerHTML">${c.text}</div>`
 }
 
-/* META */
-function updateMeta(){
- db.meta.title=titleInput.value
- db.meta.author=authorInput.value
- titleDisplay.innerText=db.meta.title
- authorDisplay.innerText=db.meta.author
- saveDB()
+/* IA */
+function generateAI(){
+ db.chapters.push({
+  title:"Gerado",
+  content:"O abismo respondeu..."
+ })
+ renderEpisodes()
 }
 
-function clearAll(){
- if(confirm("Apagar tudo?")){
-  localStorage.clear()
-  location.reload()
- }
+/* EXPORT */
+function exportBook(){
+ let txt=db.chapters.map(c=>c.title+"\n"+c.content).join("\n\n")
+ let blob=new Blob([txt])
+ let a=document.createElement("a")
+ a.href=URL.createObjectURL(blob)
+ a.download="abismo.txt"
+ a.click()
 }
 
-/* INIT */
-loadDB()
-titleInput.value=db.meta.title
-authorInput.value=db.meta.author
-updateMeta()
-view("cover")
+/* VOLTAR */
+function back(){show("library")}
 </script>
 
 </body>
